@@ -46,24 +46,20 @@ export default function ForgotPasswordForm() {
     };
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 w-[80%]">
             <div>
-                <p className="text-sm font-bold uppercase tracking-wider text-blue-400">
-                    SECURE ACCESS
-                </p>
 
-                <h1 className="mt-2 text-3xl font-semibold text-white">
-                    Forgot Password
+                <h1 className="mt-2 text-4xl font-semibold text-white">
+                    Forgot Your Password?
                 </h1>
 
-                <p className="mt-2 text-lg text-[#436481]">
-                    Get a reset link for your account.
-                </p>
+                <p className="mt-2 text-md text-slate-400">
+                    Enter the email address linked to your account, and we’ll send you a link to reset your password.                </p>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div className="flex flex-col gap-2">
-                    <label className="text-xl font-medium text-white">
+                    <label className="text-sm font-medium text-[#6B8091]">
                         Email address
                     </label>
 
@@ -71,6 +67,7 @@ export default function ForgotPasswordForm() {
                         type="email"
                         {...register("email")}
                         className="h-10 border-slate-700 bg-transparent text-white"
+                        placeholder="Enter your email"
                     />
 
                     {errors.email && (
@@ -84,20 +81,18 @@ export default function ForgotPasswordForm() {
                 <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="h-14 w-full bg-[#60A5FA] text-lg font-semibold hover:bg-[#2563eb]"
+                    className="h-14 w-full bg-[#465FFF] text-lg font-semibold hover:bg-[#2563eb]"
                 >
-                    <Mail />
+
                     {isSubmitting ? "Sending..." : "Send Reset Link"}
                 </Button>
 
-                <p className="text-md text-[#436481]">
-                    Check your inbox and spam folder after submitting.
-                </p>
 
-                <p className="text-center text-lg text-slate-400">
-                    Remember it?{" "}
-                    <Link href="/login" className="text-blue-400 hover:text-blue-300">
-                        Back to Login
+
+                <p className="text-start text-md text-slate-400">
+                    Wait, I remember my password...{" "}
+                    <Link href="/login" className="text-[#213C90] text-lg">
+                        Click here
                     </Link>
                 </p>
             </form>
