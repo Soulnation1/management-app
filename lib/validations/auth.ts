@@ -16,9 +16,12 @@ export type SignInFormData = z.infer<typeof signInSchema>;
 
 
 export const signUpSchema = z.object({
-    fullName: z
+    firstName: z
         .string()
-        .min(3, "Name must be at least 3 characters"),
+        .min(3, "First Name must be at least 3 characters"),
+    lastName: z
+        .string()
+        .min(3, "Last Name must be at least 3 characters"),
     email: z
         .string()
         .email("Please enter a valid email"),

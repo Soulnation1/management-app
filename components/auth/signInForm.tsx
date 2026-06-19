@@ -1,7 +1,10 @@
 "use client";
+import { LogIn, Check } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
+import { FaXTwitter } from "react-icons/fa6";
 
 import Link from "next/link";
-import { LogIn, Check } from "lucide-react";
+
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,30 +62,37 @@ export default function SignInForm() {
     const email = watch("email");
     return (
         <div>
-            <p className="text-md font-bold uppercase tracking-wider text-[#5EA1FF]">
-                SECURE ACCESS
-            </p>
 
-            <h1 className="mt-2 text-[28px] font-bold leading-none text-white">
-                Login
+            <h1 className="mt-2 text-[32px] font-bold leading-none text-white">
+                Sign In
             </h1>
 
-            <p className="mt-3 text-[18px] text-slate-400">
-                Sign in to your admin workspace.
+            <p className="mt-2 mb-10 text-[16px] text-slate-400">
+                Enter your email and password to sign in!
             </p>
+            <div className="flex justify-between gap-8 mt-4">
+                <Link href="#" className="flex items-center justify-center gap-2 rounded-lg bg-[#1C2433] hover:bg-[#2C3444] transition-colors duration-300 text-white h-14 w-full"> <FcGoogle size={24} />   Sign In with Google</Link>
+                <Link href="#" className="flex items-center justify-center gap-2 rounded-lg bg-[#1C2433] hover:bg-[#2C3444] transition-colors duration-300 text-white h-14 w-full"><FaXTwitter size={24} /> Sign In with X</Link>
+            </div>
+            <div className="flex items-center justify-center gap-2 mt-4">
+                <div className="h-[0.5px] w-full bg-slate-700"></div>
+                <div className="text-slate-400">or</div>
+                <div className="h-[0.5px] w-full bg-slate-700"></div>
+            </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="mt-10 space-y-7">
+            <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-7">
 
                 <div>
-                    <label className="mb-3 block text-base font-medium text-white">
-                        Email address
+                    <label className="mb-1 block text-base font-medium text-white">
+                        Email
                     </label>
                     <div className="relative">
                         <div className="relative">
                             <Input
                                 type="text"
                                 {...register("email")}
-                                className="h-10 border-slate-700 bg-transparent text-white pr-10"
+                                className="h-12 border-slate-700 bg-transparent text-white pr-10 placeholder:text-[#3D4452] placeholder:text-[16px] "
+                                placeholder="info@gmail.com"
                             />
 
                             {email && !errors.email && email.includes('@') && (
@@ -104,24 +114,20 @@ export default function SignInForm() {
 
 
                 <div>
-                    <div className="mb-3 flex items-center justify-between">
+                    <div className="mb-1 flex items-center justify-between">
                         <label className="text-base font-medium text-white">
                             Password
                         </label>
 
-                        <Link
-                            href="/forgot-password"
-                            className="font-medium text-[#5EA1FF]"
-                        >
-                            Forgot?
-                        </Link>
+
                     </div>
 
                     <div className="relative">
                         <Input
                             type="text"
                             {...register("password")}
-                            className="h-10 border-slate-700 bg-transparent text-white pr-10"
+                            className="h-12 border-slate-700 bg-transparent text-white pr-10 placeholder:text-[#3D4452] placeholder:text-[16px] "
+                            placeholder="Enter your password"
                         />
 
                         {password &&
@@ -138,27 +144,33 @@ export default function SignInForm() {
                     )}
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <Checkbox id="remember" />
-                    <label htmlFor="remember" className="text-[16px] text-white">
-                        Remember me
+                <div className="flex justify-between gap-3">
+
+                    <label htmlFor="remember" className="flex items-center gap-2 text-[16px] text-white">
+                        <Checkbox id="remember" className="border border-[#1B2638]" /> Keep me logged in
                     </label>
+                    <Link
+                        href="/forgot-password"
+                        className="font-medium text-[#3759AB]"
+                    >
+                        Forgot password?
+                    </Link>
                 </div>
 
                 <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="h-[48px] w-full bg-[#69A3F0] text-lg font-semibold"
+                    className="h-[48px] w-full bg-[#465FFF] text-lg font-semibold hover:bg-[#2533df]"
                 >
-                    <LogIn className="mr-1 h-5 w-5" />
+
 
                     {isSubmitting ? "Signing In..." : "Sign In"}
                 </Button>
 
-                <p className="text-center text-[16px] text-slate-400">
-                    New here?{" "}
+                <p className=" text-[16px] text-slate-400">
+                    Don't have an account?{" "}
                     <Link href="/register" className="text-[#5EA1FF]">
-                        Create an account
+                        Sign up
                     </Link>
                 </p>
             </form>

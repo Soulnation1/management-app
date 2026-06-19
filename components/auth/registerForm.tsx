@@ -1,8 +1,11 @@
 "use client";
+import { FcGoogle } from "react-icons/fc";
+import { FaXTwitter } from "react-icons/fa6";
+
 
 import Link from "next/link";
 import { UserPlus, Check } from "lucide-react";
-
+import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -18,6 +21,7 @@ import {
 } from "@/lib/validations/auth";
 
 import { useSignUpMutation } from "@/hooks/useCreateUserProfile";
+import { useState } from "react";
 
 export default function RegisterForm() {
     const {
@@ -29,11 +33,13 @@ export default function RegisterForm() {
         resolver: zodResolver(signUpSchema),
         mode: "onChange",
         defaultValues: {
-            fullName: "",
+            firstName: "",
+            lastName: "",
             email: "",
             password: "",
         },
     });
+    const [showPassword, setShowPassword] = useState(false);
 
     const { signUp, isLoaded } = useSignUp();
 
@@ -54,54 +60,92 @@ export default function RegisterForm() {
         }
     };
 
-    const fullName = watch("fullName");
+    const firstName = watch("firstName");
+    const lastName = watch("lastName");
     const email = watch("email");
     const password = watch("password");
+
+
 
     return (
         <div className="space-y-8">
             <div>
-                <p className="text-sm font-bold uppercase tracking-wider text-blue-400">
-                    Secure Access
-                </p>
-
-                <h1 className="mt-2 text-xl font-bold text-white">
-                    Register
+                <h1 className="mt-2 text-[32px] font-bold leading-none text-white">
+                    Sign Up
                 </h1>
 
-                <p className="mt-2 text-lg text-slate-400">
-                    Create your adminHMD account.
+                <p className="mt-2 mb-10 text-[16px] text-slate-400">
+                    Enter your email and password to sign up!
                 </p>
+            </div>
+            <div className="flex justify-between gap-8 mt-4">
+                <Link href="#" className="flex items-center justify-center gap-2 rounded-lg bg-[#1C2433] hover:bg-[#2C3444] transition-colors duration-300 text-white h-14 w-full"> <FcGoogle size={24} />   Sign In with Google</Link>
+                <Link href="#" className="flex items-center justify-center gap-2 rounded-lg bg-[#1C2433] hover:bg-[#2C3444] transition-colors duration-300 text-white h-14 w-full"><FaXTwitter size={24} /> Sign In with X</Link>
+            </div>
+            <div className="flex items-center justify-center gap-2 mt-4">
+                <div className="h-[0.5px] w-full bg-slate-700"></div>
+                <div className="text-slate-400">or</div>
+                <div className="h-[0.5px] w-full bg-slate-700"></div>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
                 <div className="relative space-y-3">
-                    <label className="text-xl font-medium text-white">
-                        Full name
-                    </label>
+                    <div className="flex justify-between w-full">
+                        <div className="flex flex-col mb-1 w-[48%]">
+                            <label className="text-base text-[#6B8091] font-medium ">
+                                First Name
+                            </label>
 
-                    <div className="relative">
-                        <Input
-                            type="text"
-                            {...register("fullName")}
-                            className="h-10 border-slate-700 bg-transparent text-white pr-10"
-                        />
+                            <div className="relative">
+                                <Input
+                                    type="text"
+                                    {...register("firstName")}
+                                    className="h-12 border-slate-700 bg-transparent text-white pr-10"
+                                />
 
-                        {fullName && !errors.fullName && fullName.length >= 3 && (
-                            <Check className="absolute right-3 top-2.5 h-5 w-5 text-green-500" />
-                        )}
+                                {firstName && !errors.firstName && firstName.length >= 3 && (
+                                    <Check className="absolute right-3 top-2.5 h-5 w-5 text-green-500" />
+                                )}
+                            </div>
+
+
+                            {errors.firstName && (
+                                <p className="text-sm text-red-500">
+                                    {errors.firstName.message}
+                                </p>
+                            )}
+                        </div>
+
+
+                        <div className="flex flex-col mb-1 w-[48%]">
+                            <label className="text-base text-[#6B8091] font-medium ">
+                                Last Name
+                            </label>
+
+                            <div className="relative">
+                                <Input
+                                    type="text"
+                                    {...register("lastName")}
+                                    className="h-12 border-slate-700 bg-transparent text-white pr-10"
+                                />
+
+                                {lastName && !errors.lastName && lastName.length >= 3 && (
+                                    <Check className="absolute right-3 top-2.5 h-5 w-5 text-green-500" />
+                                )}
+                            </div>
+
+                            {errors.lastName && (
+                                <p className="text-sm text-red-500">
+                                    {errors.lastName.message}
+                                </p>
+                            )}
+                        </div>
                     </div>
-
-                    {errors.fullName && (
-                        <p className="text-sm text-red-500">
-                            {errors.fullName.message}
-                        </p>
-                    )}
                 </div>
 
                 <div className="relative space-y-3">
-                    <label className="text-xl font-medium text-white">
+                    <label className="text-base text-[#6B8091] font-medium ">
                         Email address
                     </label>
 
@@ -109,7 +153,7 @@ export default function RegisterForm() {
                         <Input
                             type="email"
                             {...register("email")}
-                            className="h-10 border-slate-700 bg-transparent text-white pr-10"
+                            className="h-12 border-slate-700 bg-transparent text-white pr-10"
                         />
 
                         {email && !errors.email && (
@@ -125,15 +169,15 @@ export default function RegisterForm() {
                 </div>
 
                 <div className="relative space-y-3">
-                    <label className="text-xl font-medium text-white">
+                    <label className="text-base text-[#6B8091] font-medium ">
                         Password
                     </label>
 
                     <div className="relative">
                         <Input
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             {...register("password")}
-                            className="h-10 border-slate-700 bg-transparent text-white pr-10"
+                            className="h-12 border-slate-700 bg-transparent text-white pr-10"
                         />
 
                         {password &&
@@ -141,6 +185,12 @@ export default function RegisterForm() {
                             password.length >= 8 && (
                                 <Check className="absolute right-3 top-2.5 h-5 w-5 text-green-500" />
                             )}
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2"
+                        >
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}                        </button>
                     </div>
 
                     {errors.password && (
@@ -150,26 +200,25 @@ export default function RegisterForm() {
                     )}
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <Checkbox id="terms" />
-                    <label htmlFor="terms" className="text-lg text-white">
-                        I agree to the terms
+                <div className="flex w-full items-center gap-3">
+                    <Checkbox id="terms" className="border border-[#1B2638]" />
+                    <label htmlFor="terms" className="text-sm text-[#6B8091] w-full">
+                        <span ><label className="text-sm text-[#6B8091]">By creating an account means you agree to the <p className="text-sm text-white" >Terms and conditions</p><span className="flex">and our <p className="text-sm text-white"> privacy policy</p></span></label></span>
                     </label>
                 </div>
 
                 <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="h-[48px] w-full bg-[#69A3F0] text-lg font-semibold"
+                    className="h-[48px] w-full bg-[#465FFF] text-lg font-semibold"
                 >
-                    <UserPlus className="mr-2 h-5 w-5" />
 
-                    {isSubmitting ? "Creating..." : "Create Account"}
+                    {isSubmitting ? "Signing Up..." : "Sign Up"}
                 </Button>
 
-                <p className="text-center text-lg text-slate-400">
+                <p className="text-center text-sm text-slate-400">
                     Already have an account?{" "}
-                    <Link href="/login" className="text-blue-400 hover:text-blue-300">
+                    <Link href="/login" className="text-[#465FFF] hover:text-blue-300">
                         Sign in
                     </Link>
                 </p>
