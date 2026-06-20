@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { Mail } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,18 +8,20 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { useSignIn } from "@clerk/nextjs";
 
 import {
     forgotPasswordSchema,
     type ForgotPasswordFormData,
-} from "@/lib/validations/auth";
+} from "@/lib/validations/authSchema";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useForgotPassword } from "@/hooks/forgot-password-hook/useForgotPassword";
 
 export default function ForgotPasswordForm() {
     const {
         register,
         handleSubmit,
-        formState: { errors, isSubmitting },
+        formState: { errors, isSubmitting, isPending },
     } = useForm<ForgotPasswordFormData>({
         resolver: zodResolver(forgotPasswordSchema),
         defaultValues: {
@@ -28,21 +29,23 @@ export default function ForgotPasswordForm() {
         },
     });
 
-    const { signIn, isLoaded } = useSignIn();
+    const router = useRouter();
 
-    const onSubmit = async (data: ForgotPasswordFormData) => {
-        if (!isLoaded || !signIn) return;
+    const { mutate } = useForgotPassword();
 
-        try {
-            await signIn.create({
-                strategy: "reset_password_email_code",
-                identifier: data.email,
-            });
-
-            alert("Reset link sent to your email");
-        } catch (error: any) {
-            console.error(error?.errors?.[0]?.message || error);
-        }
+    const onSubmit = (data: ForgotPasswordFormData) => {
+        mutate(data.email, {
+            onSuccess: () => {
+                toast.success("Reset link sent successfully");
+                router.push("/login");
+            },
+            onError: (error: any) => {
+                toast.error(
+                    error?.response?.data?.message ||
+                    "Failed to send reset link"
+                );
+            },
+        });
     };
 
     return (
@@ -84,7 +87,7 @@ export default function ForgotPasswordForm() {
                     className="h-14 w-full bg-[#465FFF] text-lg font-semibold hover:bg-[#2563eb]"
                 >
 
-                    {isSubmitting ? "Sending..." : "Send Reset Link"}
+                    {isPending ? "Sending..." : "Send Reset Link"}
                 </Button>
 
 

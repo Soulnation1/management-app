@@ -1,10 +1,10 @@
 "use client";
-import { LogIn, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
-import { FaXTwitter } from "react-icons/fa6";
+import { Eye, EyeOff } from "lucide-react";
 
 import Link from "next/link";
-
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,16 +13,18 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-import { useSignIn, useAuth } from "@clerk/nextjs";
+import { useLogin } from "@/hooks/login-hook/useLogin";
 
 import {
     signInSchema,
     type SignInFormData,
-} from "@/lib/validations/auth";
+} from "@/lib/validations/authSchema";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function SignInForm() {
 
+    const router = useRouter();
     const {
         register,
         handleSubmit,
@@ -36,30 +38,25 @@ export default function SignInForm() {
         },
     });
 
-    const { signIn, setActive } = useSignIn();
-    const { isLoaded } = useAuth();
+    const { mutate } = useLogin();
 
-    const onSubmit = async (data: SignInFormData) => {
-        if (!isLoaded || !signIn) return;
-
-        try {
-            const result = await signIn.create({
-                identifier: data.email,
-                password: data.password,
-            });
-
-            if (result.status === "complete") {
-                await setActive({
-                    session: result.createdSessionId,
-                });
-            }
-        } catch (error: any) {
-            console.error(error?.errors?.[0]?.message || error);
-        }
+    const onSubmit = (data: SignInFormData) => {
+        mutate(data, {
+            onSuccess: () => {
+                toast.success("Login successful");
+                router.push("/dashboard");
+            },
+            onError: (error: any) => {
+                toast.error(
+                    error?.response?.data?.message ||
+                    "Login failed"
+                );
+            },
+        });
     };
-
     const password = watch("password");
     const email = watch("email");
+    const [showPassword, setShowPassword] = useState(false);
     return (
         <div>
 
@@ -72,7 +69,7 @@ export default function SignInForm() {
             </p>
             <div className="flex justify-between gap-8 mt-4">
                 <Link href="#" className="flex items-center justify-center gap-2 rounded-lg bg-[#1C2433] hover:bg-[#2C3444] transition-colors duration-300 text-white h-14 w-full"> <FcGoogle size={24} />   Sign In with Google</Link>
-                <Link href="#" className="flex items-center justify-center gap-2 rounded-lg bg-[#1C2433] hover:bg-[#2C3444] transition-colors duration-300 text-white h-14 w-full"><FaXTwitter size={24} /> Sign In with X</Link>
+
             </div>
             <div className="flex items-center justify-center gap-2 mt-4">
                 <div className="h-[0.5px] w-full bg-slate-700"></div>
@@ -121,20 +118,32 @@ export default function SignInForm() {
 
 
                     </div>
-
                     <div className="relative">
                         <Input
-                            type="text"
+                            type={showPassword ? "text" : "password"}
                             {...register("password")}
-                            className="h-12 border-slate-700 bg-transparent text-white pr-10 placeholder:text-[#3D4452] placeholder:text-[16px] "
-                            placeholder="Enter your password"
+                            className="h-12 border-slate-700 bg-transparent pr-16 text-white"
                         />
 
-                        {password &&
-                            !errors.password &&
-                            password.length >= 8 && (
-                                <Check className="absolute right-3 top-2.5 h-5 w-5 text-green-500" />
-                            )}
+                        <div className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-2">
+                            {password &&
+                                !errors.password &&
+                                password.length >= 8 && (
+                                    <Check className="h-5 w-5 text-green-500" />
+                                )}
+
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="flex items-center justify-center text-black hover:text-slate-700 transition duration-300"
+                            >
+                                {showPassword ? (
+                                    <EyeOff size={18} />
+                                ) : (
+                                    <Eye size={18} />
+                                )}
+                            </button>
+                        </div>
                     </div>
 
                     {errors.password && (

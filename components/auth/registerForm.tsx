@@ -1,10 +1,9 @@
 "use client";
 import { FcGoogle } from "react-icons/fc";
-import { FaXTwitter } from "react-icons/fa6";
 
 
 import Link from "next/link";
-import { UserPlus, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -13,15 +12,16 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { useSignUp } from "@clerk/nextjs";
 
 import {
     signUpSchema,
     type SignUpFormData,
-} from "@/lib/validations/auth";
+} from "@/lib/validations/authSchema";
 
-import { useSignUpMutation } from "@/hooks/useCreateUserProfile";
 import { useState } from "react";
+import { useRegister } from "@/hooks/register-hook/useRegister";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
     const {
@@ -41,23 +41,23 @@ export default function RegisterForm() {
     });
     const [showPassword, setShowPassword] = useState(false);
 
-    const { signUp, isLoaded } = useSignUp();
 
-    const { mutateAsync: signUpUser } = useSignUpMutation(signUp);
+    const { mutate } = useRegister();
+    const router = useRouter();
 
-    const onSubmit = async (data: SignUpFormData) => {
-        if (!isLoaded || !signUp) return;
-
-        try {
-            const result = await signUpUser(data);
-
-            console.log("Signup result:", result);
-
-
-
-        } catch (error: any) {
-            console.error(error?.errors?.[0]?.message || error);
-        }
+    const onSubmit = (data: SignUpFormData) => {
+        mutate(data, {
+            onSuccess: () => {
+                toast.success("Registration successful");
+                router.push("/login")
+            },
+            onError: (error: any) => {
+                toast.error(
+                    error?.response?.data?.message ||
+                    "Registration failed"
+                );
+            },
+        });
     };
 
     const firstName = watch("firstName");
@@ -78,9 +78,9 @@ export default function RegisterForm() {
                     Enter your email and password to sign up!
                 </p>
             </div>
-            <div className="flex justify-between gap-8 mt-4">
+            <div className="flex justify-center mt-4">
                 <Link href="#" className="flex items-center justify-center gap-2 rounded-lg bg-[#1C2433] hover:bg-[#2C3444] transition-colors duration-300 text-white h-14 w-full"> <FcGoogle size={24} />   Sign In with Google</Link>
-                <Link href="#" className="flex items-center justify-center gap-2 rounded-lg bg-[#1C2433] hover:bg-[#2C3444] transition-colors duration-300 text-white h-14 w-full"><FaXTwitter size={24} /> Sign In with X</Link>
+
             </div>
             <div className="flex items-center justify-center gap-2 mt-4">
                 <div className="h-[0.5px] w-full bg-slate-700"></div>
@@ -177,20 +177,28 @@ export default function RegisterForm() {
                         <Input
                             type={showPassword ? "text" : "password"}
                             {...register("password")}
-                            className="h-12 border-slate-700 bg-transparent text-white pr-10"
+                            className="h-12 border-slate-700 bg-transparent pr-16 text-white"
                         />
 
-                        {password &&
-                            !errors.password &&
-                            password.length >= 8 && (
-                                <Check className="absolute right-3 top-2.5 h-5 w-5 text-green-500" />
-                            )}
-                        <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2"
-                        >
-                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}                        </button>
+                        <div className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-2">
+                            {password &&
+                                !errors.password &&
+                                password.length >= 8 && (
+                                    <Check className="h-5 w-5 text-green-500" />
+                                )}
+
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="flex items-center justify-center text-slate-400 hover:text-white"
+                            >
+                                {showPassword ? (
+                                    <EyeOff size={18} />
+                                ) : (
+                                    <Eye size={18} />
+                                )}
+                            </button>
+                        </div>
                     </div>
 
                     {errors.password && (
@@ -200,10 +208,10 @@ export default function RegisterForm() {
                     )}
                 </div>
 
-                <div className="flex w-full items-center gap-3">
-                    <Checkbox id="terms" className="border border-[#1B2638]" />
+                <div className="flex w-full  gap-3 items-star">
+                    <Checkbox id="terms" className="border border-[#1B2638] t" />
                     <label htmlFor="terms" className="text-sm text-[#6B8091] w-full">
-                        <span ><label className="text-sm text-[#6B8091]">By creating an account means you agree to the <p className="text-sm text-white" >Terms and conditions</p><span className="flex">and our <p className="text-sm text-white"> privacy policy</p></span></label></span>
+                        <span ><label className="text-sm text-[#6B8091]">By creating an account means you agree to the <p className="text-sm text-white" >Terms and conditions</p><span className="">and our <p className="text-sm text-white">  privacy policy</p></span></label></span>
                     </label>
                 </div>
 
